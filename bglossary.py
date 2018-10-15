@@ -26,18 +26,56 @@ bglossary_default_settings = {
     'template': {
         'panel': """
             <div class="panel {{ panel_color }}">
-              {% if header %}
-              <div class="panel-heading">
-                <h3 class="panel-title">{{header}}</h3>
-              </div>
-              {% endif %}
-              <table class="table bglossary-container">
-              {{list}}
-              </table>
+                {% if header %}
+                    <div class="panel-heading">
+                    <h3 class="panel-title">{{header}}</h3>
+                    </div>
+                {% endif %}
+                {% if show_stats %}
+                {% if latest_update or term_count or translation_counts %}
+                <p class="text-right">
+                    {% if term_count %}
+                    <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
+                    {% endif %}
+                    {% if translation_counts -%}
+                        <small class="text-muted"><strong>Translations</strong> 
+                        {% for key, value in translation_counts.items() -%}
+                        <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" />{{value}} {% endfor -%}
+                        {% if latest_update %}, {% endif %}
+                        </small>
+                    {% endif %}
+                    {% if latest_update %}
+                    <small class="text-muted"><strong>Updated</strong> {{latest_update}}</small>
+                    {% endif %}
+                </p>                
+                {% endif %}
+                {% endif %}
+                <table class="table bglossary-container">
+                {{list}}
+                </table>
             </div>
         """,
         'list': """
-            {% if header %}<h3 class="section-heading text-center">{{header}}</h3>{% endif %}
+            {% if header %}<h1 class="section-heading">{{header}}</h1>{% endif %}
+            {% if show_stats %}
+            {% if latest_update or term_count or translation_counts %}            
+            <p class="text-right">
+                {% if term_count %}
+                <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
+                {% endif %}
+                {% if translation_counts -%}
+                    <small class="text-muted"><strong>Translations</strong> 
+                    {% for key, value in translation_counts.items() -%}
+                    <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" />{{value}} {% endfor -%}
+                    {% if latest_update %}, {% endif %}
+                    </small>
+                {% endif %}
+                {% if latest_update %}
+                <small class="text-muted"><strong>Updated</strong> {{latest_update}}</small>
+                {% endif %}
+            </p>
+            {% endif %}
+            {% endif %}
             <div class="list-group bglossary-container"  style="padding-left:1em;">
                 <div class="row">
                 {{list}}
@@ -202,6 +240,10 @@ bglossary_default_settings = {
                 </div>
             </div>
         """},
+    'alphabet-template': {
+        'panel': """<tr><td colspan="20"><h1 class="alphabet"><span class="label label-default">{{alphabet}}</span></h1></td></tr>""",
+        'list': """<h1 class="alphabet"><span class="label label-default">{{alphabet}}</span></h1>"""
+    },
     'data-source': None,
     'set': None,
     'show': False,
@@ -209,6 +251,7 @@ bglossary_default_settings = {
     'generate_minified': True,
     'template-variable': False,
     'show-dividers': True,
+    'show-stats': True,
     'sort': False,
     'fields': '',
     'site-url': '',
@@ -229,6 +272,10 @@ def load_glossary_registry(source):
         try:
             with open(source, 'r') as field:
                 glossary_registry = yaml.load(field)
+
+            from datetime import datetime
+            modification_timestamp = os.path.getmtime(source)
+            modification_date = datetime.utcfromtimestamp(modification_timestamp).strftime('%Y-%m-%d')
 
             if 'data' in glossary_registry:
                 glossary_registry = glossary_registry['data']
@@ -251,7 +298,6 @@ def load_glossary_registry(source):
                                 else:
                                     field_list.append(parts[0])
 
-                            #item[field] = ', '.join(field_list)
                             item[field] = field_list
 
                     if isinstance(item['term'], list):
@@ -263,6 +309,7 @@ def load_glossary_registry(source):
 
             return {
                 'glossary': glossary_data,
+                'modification_date': modification_date,
             }
 
         except ValueError:
@@ -296,9 +343,6 @@ def generate_listing(settings):
     :param settings: settings dict
     :return: html content
     """
-
-    #import inflect
-    #p = inflect.engine()
 
     glossary_registry = load_glossary_registry(source=settings['data-source'])
 
@@ -383,14 +427,19 @@ def generate_listing(settings):
                     )
 
         html = "\n"
+        alphabet_header_template = Template(settings['alphabet-template'][settings['mode']].strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
+
         current_letter = None
+        term_count = 0
+        translation_counts = {}
+        active_translations = []
+        for field in settings['fields']:
+            if len(field) == 2:
+                active_translations.append(field)
         for glossary_key, glossary_item in glossary.items():
             if current_letter != glossary_item['term'][0].upper():
                 if settings['show-dividers']:
-                    if settings['mode'] == 'list':
-                        html += '<h1 class="alphabet"><span class="label label-default">' + glossary_item['term'][0].upper() + '</span></h1>'
-                    elif settings['mode'] == 'panel':
-                        html += '<tr><td colspan="20"><h1 class="alphabet"><span class="label label-default">' + glossary_item['term'][0].upper() + '</span></h1></td></tr>'
+                    html += alphabet_header_template.render(alphabet=glossary_item['term'][0].upper())
 
                 current_letter = glossary_item['term'][0].upper()
 
@@ -403,8 +452,16 @@ def generate_listing(settings):
 
             html += generate_listing_item(
                 glossary_item=glossary_item,
-                settings=settings
+                settings=settings,
             ) + "\n"
+
+            term_count += 1
+
+            for lang in active_translations:
+                if lang in glossary_item and glossary_item[lang]:
+                    if lang not in translation_counts:
+                        translation_counts[lang] = 0
+                    translation_counts[lang] += 1
 
         html += "\n"
 
@@ -415,7 +472,11 @@ def generate_listing(settings):
                 list=html,
                 header=settings.get('header'),
                 site_url=settings.get('site-url'),
-                panel_color=settings.get('panel-color')
+                panel_color=settings.get('panel-color'),
+                show_stats=settings.get('show-stats'),
+                latest_update=glossary_registry['modification_date'],
+                term_count=term_count,
+                translation_counts=translation_counts
             ), "html.parser"
         )
 
@@ -516,6 +577,7 @@ def bglossary(content):
             settings['panel-color'] = get_attribute(bglossary_div.attrs, 'panel-color', bglossary_settings['panel-color'])
             settings['fields'] = get_attribute(bglossary_div.attrs, 'fields', bglossary_settings['fields'])
             settings['show-dividers'] = get_attribute(bglossary_div.attrs, 'show-dividers', bglossary_settings['show-dividers']) in ['True', 'true']
+            settings['show-stats'] = get_attribute(bglossary_div.attrs, 'show-stats', bglossary_settings['show-stats']) in ['True', 'true']
 
             if isinstance(settings['fields'], str):
                 settings['fields'] = [x.strip() for x in settings['fields'].split(',')]

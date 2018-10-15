@@ -7,20 +7,19 @@
     padding-bottom: 0.25em;
     margin-left: -15px;
 }
-.bglossary-container h1[id], .bglossary-container h2[id], .bglossary-container h3[id], .bglossary-container h4[id]{
-  /*padding-top: 0;
-  margin-top: 0;*/
-  padding-top: 45px;
-  margin-top: -25px;
 
+.bglossary-container h1[id], .bglossary-container h2[id], .bglossary-container h3[id], .bglossary-container h4[id]{
+    padding-top: 45px;
+    margin-top: -25px;
 }
+
 .bglossary-container .list-group-item{
     padding-bottom: 40px;
 }
+
 /*!
  * Generated with CSS Flag Sprite generator (https://www.flag-sprites.com/)
  */
-
 .flag {
     display: inline-block;
     width: 16px;
