@@ -281,7 +281,6 @@ def load_glossary_registry(source):
                 glossary_registry = glossary_registry['data']
 
             glossary_data = collections.OrderedDict()
-            set_data = collections.OrderedDict()
 
             if 'glossary' in glossary_registry:
                 for item in glossary_registry['glossary']:
@@ -305,7 +304,15 @@ def load_glossary_registry(source):
 
                     key = item['term'].lower().replace(' ', '_')
 
-                    glossary_data[key] = item
+                    if key not in glossary_data:
+                        glossary_data[key] = item
+
+                    else:
+                        logger.warn(
+                            '`pelican-bglossary` term [{term}] appears multiple times in the glossary.'.format(
+                                term=item['term']
+                            ))
+                        glossary_data[key] = item
 
             return {
                 'glossary': glossary_data,
@@ -364,12 +371,44 @@ def generate_listing(settings):
         from flashtext import KeywordProcessor
         keyword_processor = KeywordProcessor()
 
-        intra_links = {}
+        from textblob import TextBlob
 
+        intra_links = {}
         for item_key, item in glossary.items():
             term = item.get('term', '')
 
             for t in term.split(','):
+                t = t.strip()
+
+                tt = TextBlob(t)
+                if tt.tags[-1][1] == 'NN':
+                    anchor = term.replace(' ', '-').lower()
+                    if 'abbreviation' in item:
+                        anchor += '-' + item.get('abbreviation', '').replace(' ', '-').lower()
+
+                    words = list(tt.words)
+                    words[-1] = tt.words[-1].pluralize()
+                    t_plural = " ".join(words)
+
+                    words = list(tt.words)
+                    words[-1] = tt.words[-1].singularize()
+                    t_singular = " ".join(words)
+
+                    keyword_processor.add_keyword(
+                        t_singular.lower(),
+                        '<a href="#{anchor}">{term}</a>'.format(
+                            anchor=anchor,
+                            term=t_singular.lower()
+                        )
+                    )
+                    keyword_processor.add_keyword(
+                        t_plural.lower(),
+                        '<a href="#{anchor}">{term}</a>'.format(
+                            anchor=anchor,
+                            term=t_plural.lower()
+                        )
+                    )
+
                 if len(t.split(' ')) > 1:
                     anchor = term.replace(' ', '-').lower()
                     if 'abbreviation' in item:
