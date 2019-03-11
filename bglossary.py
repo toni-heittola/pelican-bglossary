@@ -103,7 +103,7 @@ bglossary_default_settings = {
                         </p>
                         </div>
                         {% endif %}                        
-                        {% if de or es or fi or fr %}
+                        {% if de or es or fi or fr or pl %}
                         <div class="col-md-12">
                         <div class="row">  
                             {% if de %}
@@ -150,6 +150,17 @@ bglossary_default_settings = {
                                 </em>
                                 </div>   
                             {% endif %}
+                            {% if pl %}
+                                <div class="col-md-12">
+                                <img src="theme/images/bglossary_blank.gif" class="flag flag-pl" alt="Poland" /> <em>
+                                {% if pl is iterable and pl is not string %}
+                                    {{ pl|join(', ') }}                                
+                                {% else %}                                
+                                    {{ pl }}
+                                {% endif %}
+                                </em>
+                                </div>   
+                            {% endif %}
                             </div>  
                         </div>
                         {% endif %}
@@ -187,7 +198,7 @@ bglossary_default_settings = {
                             {% if intra_link %}                            
                             <p class="text-justify"><strong>See also:</strong> {{ intra_link }}</p>                              
                             {% endif %}                                                        
-                            {% if de or es or fi or fr %}
+                            {% if de or es or fi or fr or pl %}
                                 <div class="row">  
                                 {% if de %}
                                     <div class="col-md-12">
@@ -229,6 +240,17 @@ bglossary_default_settings = {
                                         {{ fr|join(', ') }}                                
                                     {% else %}                                
                                         {{ fr }}
+                                    {% endif %}
+                                    </em>
+                                    </div>   
+                                {% endif %}
+                                {% if pl %}
+                                    <div class="col-md-12">
+                                    <img src="theme/images/bglossary_blank.gif" class="flag flag-pl" alt="Poland" /> <em>
+                                    {% if pl is iterable and pl is not string %}
+                                        {{ pl|join(', ') }}                                
+                                    {% else %}                                
+                                        {{ pl }}
                                     {% endif %}
                                     </em>
                                     </div>   
