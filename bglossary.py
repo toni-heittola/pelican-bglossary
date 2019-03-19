@@ -292,8 +292,13 @@ def load_glossary_registry(source):
 
     if source and os.path.isfile(source):
         try:
-            with open(source, 'r') as field:
-                glossary_registry = yaml.load(field)
+            from distutils.version import LooseVersion
+            if LooseVersion(str(yaml.__version__)) >= "5.1":
+                with open(source, 'r') as field:
+                    glossary_registry = yaml.load(field, Loader=yaml.FullLoader)
+            else:
+                with open(source, 'r') as field:
+                    glossary_registry = yaml.load(field)
 
             from datetime import datetime
             modification_timestamp = os.path.getmtime(source)
