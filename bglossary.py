@@ -15,6 +15,9 @@ from jinja2 import Template
 from pelican import signals, contents
 import yaml
 import collections
+from io import open
+import unicodedata
+from builtins import str
 
 logger = logging.getLogger(__name__)
 __version__ = '0.1.0'
@@ -294,10 +297,10 @@ def load_glossary_registry(source):
         try:
             from distutils.version import LooseVersion
             if LooseVersion(str(yaml.__version__)) >= "5.1":
-                with open(source, 'r') as field:
+                with open(source, 'r', encoding='utf-8') as field:
                     glossary_registry = yaml.load(field, Loader=yaml.FullLoader)
             else:
-                with open(source, 'r') as field:
+                with open(source, 'r', encoding='utf-8') as field:
                     glossary_registry = yaml.load(field)
 
             from datetime import datetime
@@ -329,7 +332,9 @@ def load_glossary_registry(source):
                     if isinstance(item['term'], list):
                         item['term'] = ', '.join(item['term'])
 
-                    key = item['term'].lower().replace(' ', '_')
+                    item['term'] = str(item['term'])
+                    key = item['term'].lower().replace(' ', '-').replace('.', '').replace('(', '').replace(')', '')
+                    key = unicodedata.normalize('NFKD', key).encode('ascii', 'ignore').decode('utf-8')
 
                     if key not in glossary_data:
                         glossary_data[key] = item
@@ -403,13 +408,14 @@ def generate_listing(settings):
         intra_links = {}
         for item_key, item in glossary.items():
             term = item.get('term', '')
+            anchor = term.lower().replace(' ', '-').replace('.', '').replace('(', '').replace(')', '').replace('/', '')
+            anchor = unicodedata.normalize('NFKD', anchor).encode('ascii', 'ignore').decode('utf-8')
 
             for t in term.split(','):
                 t = t.strip()
 
                 tt = TextBlob(t)
                 if tt.tags[-1][1] == 'NN':
-                    anchor = term.replace(' ', '-').lower()
                     if 'abbreviation' in item:
                         anchor += '-' + item.get('abbreviation', '').replace(' ', '-').lower()
 
@@ -423,21 +429,20 @@ def generate_listing(settings):
 
                     keyword_processor.add_keyword(
                         t_singular.lower(),
-                        '<a href="#{anchor}">{term}</a>'.format(
+                        u'<a href="#{anchor}">{term}</a>'.format(
                             anchor=anchor,
                             term=t_singular.lower()
                         )
                     )
                     keyword_processor.add_keyword(
                         t_plural.lower(),
-                        '<a href="#{anchor}">{term}</a>'.format(
+                        u'<a href="#{anchor}">{term}</a>'.format(
                             anchor=anchor,
                             term=t_plural.lower()
                         )
                     )
 
                 if len(t.split(' ')) > 1:
-                    anchor = term.replace(' ', '-').lower()
                     if 'abbreviation' in item:
                         anchor += '-' + item.get('abbreviation', '').replace(' ', '-').lower()
 
@@ -448,7 +453,7 @@ def generate_listing(settings):
 
                         keyword_processor.add_keyword(
                             t.lower(),
-                            '<a href="#{anchor}">{term}</a>'.format(
+                            u'<a href="#{anchor}">{term}</a>'.format(
                                 anchor=anchor,
                                 term=item.get('abbreviation')
                             )
@@ -456,7 +461,7 @@ def generate_listing(settings):
 
                     keyword_processor.add_keyword(
                         t.lower(),
-                        '<a href="#{anchor}">{term}</a>'.format(
+                        u'<a href="#{anchor}">{term}</a>'.format(
                             anchor=anchor,
                             term=t
                         )
@@ -464,10 +469,11 @@ def generate_listing(settings):
 
         for item_key, item in glossary.items():
             term = item.get('term', '')
+            anchor = term.lower().replace(' ', '-').replace('.', '').replace('(', '').replace(')', '').replace('/', '')
+            anchor = unicodedata.normalize('NFKD', anchor).encode('ascii', 'ignore').decode('utf-8')
 
             for t in term.split(','):
                 if len(t.split(' ')) == 1:
-                    anchor = term.replace(' ', '-').lower()
                     if 'abbreviation' in item:
                         anchor += '-' + item.get('abbreviation', '').replace(' ', '-').lower()
 
@@ -478,7 +484,7 @@ def generate_listing(settings):
 
                         keyword_processor.add_keyword(
                             t.lower(),
-                            '<a href="#{anchor}">{term}</a>'.format(
+                            u'<a href="#{anchor}">{term}</a>'.format(
                                 anchor=anchor,
                                 term=item.get('abbreviation')
                             )
@@ -486,7 +492,7 @@ def generate_listing(settings):
 
                     keyword_processor.add_keyword(
                         t.lower(),
-                        '<a href="#{anchor}">{term}</a>'.format(
+                        u'<a href="#{anchor}">{term}</a>'.format(
                             anchor=anchor,
                             term=t
                         )
