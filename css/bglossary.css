@@ -16,6 +16,14 @@
 .bglossary-container .list-group-item{
     padding-bottom: 40px;
 }
+.bglossary-header-container p.stats{
+    font-size: 110%;
+    height: 16px;
+}
+
+.bglossary-header-container .stats .flag{
+
+}
 
 /*!
  * Generated with CSS Flag Sprite generator (https://www.flag-sprites.com/)
@@ -26,7 +34,6 @@
     height: 16px;
     background: url('../images/bglossary_flags.png') no-repeat;
 }
-
 
 .flag.flag-ad {
     background-position: -16px 0;

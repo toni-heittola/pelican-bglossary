@@ -27,16 +27,45 @@ bglossary_default_settings = {
     'header': 'Glossary',
     'mode': 'list',
     'template': {
-        'panel': """
+        'panel': """   
             <div class="panel {{ panel_color }}">
                 {% if header %}
                     <div class="panel-heading">
                     <h3 class="panel-title">{{header}}</h3>
                     </div>
                 {% endif %}
+                <div class="bglossary-header-container">
+                <div class="row">            
+                {% if show_search %}
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-addon" style="height:35px;"><span class="glyphicon glyphicon-search"></span></span>                    
+                        <input type="text" class="form-control" id="bglossary-search" value="" style="height:36px;" placeholder="Search terms...">
+                         <div class="input-group-btn" style="height:35px;">
+                          <button id="bglossary-search-clear" class="btn btn-default" type="button" style="height:36px;">
+                            <i class="glyphicon glyphicon-remove"></i>
+                          </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if show_lang_selector %}
+                <div class="col-md-6">
+                    <div class="btn-group pull-right">
+                    {% for key, value in translation_counts.items() -%}
+                        <button type="button" class="btn btn-xs btn-default bglossary-lang-selector" type="button" data-lang="{{key}}">
+                            <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" /> {{key}}
+                        </button>        
+                    {% endfor -%}
+                    </div>
+                </div>
+                {% endif %}
+                </div>
+                <div class="row">            
                 {% if show_stats %}
                 {% if latest_update or term_count or translation_counts %}
-                <p class="text-right">
+                <div class="col-md-12">            
+                <p class="stats" style="padding-top:8px;">
                     {% if term_count %}
                     <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
                     {% endif %}
@@ -50,9 +79,13 @@ bglossary_default_settings = {
                     {% if latest_update %}
                     <small class="text-muted"><strong>Updated</strong> {{latest_update}}</small>
                     {% endif %}
-                </p>                
+                </p>
+                </div>
                 {% endif %}
                 {% endif %}
+                </div>
+                </div>                     
+                                
                 <table class="table bglossary-container">
                 {{list}}
                 </table>
@@ -60,9 +93,38 @@ bglossary_default_settings = {
         """,
         'list': """
             {% if header %}<h1 class="section-heading">{{header}}</h1>{% endif %}
+            <div class="bglossary-header-container">
+            <div class="row">            
+            {% if show_search %}
+            <div class="col-md-6" style="padding-left:0px;">
+                <div class="input-group">
+                    <span class="input-group-addon" style="height:35px;"><span class="glyphicon glyphicon-search"></span></span>                    
+                    <input type="text" class="form-control" id="bglossary-search" value="" style="height:36px;" placeholder="Search terms...">
+                     <div class="input-group-btn" style="height:35px;">
+                      <button id="bglossary-search-clear" class="btn btn-default" type="button" style="height:36px;">
+                        <i class="glyphicon glyphicon-remove"></i>
+                      </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% if show_lang_selector %}
+            <div class="col-md-6">
+                <div class="btn-group pull-right">
+                {% for key, value in translation_counts.items() -%}
+                    <button type="button" class="btn btn-xs btn-default bglossary-lang-selector" type="button" data-lang="{{key}}">
+                        <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" /> {{key}}
+                    </button>        
+                {% endfor -%}
+                </div>
+            </div>
+            {% endif %}
+            </div>
+            <div class="row">            
             {% if show_stats %}
-            {% if latest_update or term_count or translation_counts %}            
-            <p class="text-right">
+            {% if latest_update or term_count or translation_counts %}
+            <div class="col-md-12" style="padding-left:0px;">            
+            <p class="stats" style="padding-top:8px;">
                 {% if term_count %}
                 <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
                 {% endif %}
@@ -77,8 +139,11 @@ bglossary_default_settings = {
                 <small class="text-muted"><strong>Updated</strong> {{latest_update}}</small>
                 {% endif %}
             </p>
+            </div>
             {% endif %}
             {% endif %}
+            </div>
+            </div>
             <div class="list-group bglossary-container"  style="padding-left:1em;">
                 <div class="row">
                 {{list}}
@@ -87,7 +152,7 @@ bglossary_default_settings = {
         """},
     'item-template': {
         'panel': """
-            <tr>
+            <tr class="bglossary-item" data-term="{{term}}" data-alphabet="{{alphabet}}">
                 <td class="{{item_css}}">
                     <div class="row">
                         <div class="col-md-12">
@@ -110,7 +175,7 @@ bglossary_default_settings = {
                         <div class="col-md-12">
                         <div class="row">  
                             {% if de %}
-                                <div class="col-md-12">
+                                <div class="col-md-12 de">
                                 <img src="theme/images/bglossary_blank.gif" class="flag flag-de" alt="German" /> <em>
                                 {% if de is iterable and de is not string %}
                                     {{ de|join(', ') }}                                
@@ -121,7 +186,7 @@ bglossary_default_settings = {
                                 </div>      
                             {% endif %} 
                             {% if es %}
-                                <div class="col-md-12">
+                                <div class="col-md-12 es">
                                 <img src="theme/images/bglossary_blank.gif" class="flag flag-es" alt="Spain" /> <em>
                                 {% if es is iterable and es is not string %}
                                     {{ es|join(', ') }}                                
@@ -132,7 +197,7 @@ bglossary_default_settings = {
                                 </div>      
                             {% endif %}                                                  
                             {% if fi %}
-                                <div class="col-md-12">
+                                <div class="col-md-12 fi">
                                 <img src="theme/images/bglossary_blank.gif" class="flag flag-fi" alt="Finland" /> <em>
                                 {% if fi is iterable and fi is not string %}
                                     {{ fi|join(', ') }}                                
@@ -143,7 +208,7 @@ bglossary_default_settings = {
                                 </div>   
                             {% endif %}
                             {% if fr %}
-                                <div class="col-md-12">
+                                <div class="col-md-12 fr">
                                 <img src="theme/images/bglossary_blank.gif" class="flag flag-fr" alt="France" /> <em>
                                 {% if fr is iterable and fr is not string %}
                                     {{ fr|join(', ') }}                                
@@ -154,7 +219,7 @@ bglossary_default_settings = {
                                 </div>   
                             {% endif %}
                             {% if pl %}
-                                <div class="col-md-12">
+                                <div class="col-md-12 pl">
                                 <img src="theme/images/bglossary_blank.gif" class="flag flag-pl" alt="Poland" /> <em>
                                 {% if pl is iterable and pl is not string %}
                                     {{ pl|join(', ') }}                                
@@ -172,7 +237,7 @@ bglossary_default_settings = {
             </tr>
         """,
         'list': """
-            <div class="row list-group-item">
+            <div class="row list-group-item bglossary-item" data-term="{{term}}" data-alphabet="{{alphabet}}">
                 <div class="col-xs-12">
                     <div class="row">
                         <div class="col-xs-10">
@@ -204,7 +269,7 @@ bglossary_default_settings = {
                             {% if de or es or fi or fr or pl %}
                                 <div class="row">  
                                 {% if de %}
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 de">
                                     <img src="theme/images/bglossary_blank.gif" class="flag flag-de" alt="German" /> <em>
                                     {% if de is iterable and de is not string %}
                                         {{ de|join(', ') }}                                
@@ -215,7 +280,7 @@ bglossary_default_settings = {
                                     </div>      
                                 {% endif %} 
                                 {% if es %}
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 es">
                                     <img src="theme/images/bglossary_blank.gif" class="flag flag-es" alt="Spain" /> <em>
                                     {% if es is iterable and es is not string %}
                                         {{ es|join(', ') }}                                
@@ -226,7 +291,7 @@ bglossary_default_settings = {
                                     </div>      
                                 {% endif %}                                                  
                                 {% if fi %}
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 fi">
                                     <img src="theme/images/bglossary_blank.gif" class="flag flag-fi" alt="Finland" /> <em>
                                     {% if fi is iterable and fi is not string %}
                                         {{ fi|join(', ') }}                                
@@ -237,7 +302,7 @@ bglossary_default_settings = {
                                     </div>   
                                 {% endif %}
                                 {% if fr %}
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 fr">
                                     <img src="theme/images/bglossary_blank.gif" class="flag flag-fr" alt="France" /> <em>
                                     {% if fr is iterable and fr is not string %}
                                         {{ fr|join(', ') }}                                
@@ -248,7 +313,7 @@ bglossary_default_settings = {
                                     </div>   
                                 {% endif %}
                                 {% if pl %}
-                                    <div class="col-md-12">
+                                    <div class="col-md-12 pl">
                                     <img src="theme/images/bglossary_blank.gif" class="flag flag-pl" alt="Poland" /> <em>
                                     {% if pl is iterable and pl is not string %}
                                         {{ pl|join(', ') }}                                
@@ -266,8 +331,8 @@ bglossary_default_settings = {
             </div>
         """},
     'alphabet-template': {
-        'panel': """<tr><td colspan="20"><h1 class="alphabet"><span class="label label-default">{{alphabet}}</span></h1></td></tr>""",
-        'list': """<h1 class="alphabet"><span class="label label-default">{{alphabet}}</span></h1>"""
+        'panel': """<tr class="alphabet" data-alphabet="{{alphabet}}"><td colspan="20"><h1 class="alphabet" data-alphabet="{{alphabet}}"><span class="label label-default">{{alphabet}}</span></h1></td></tr>""",
+        'list': """<h1 class="alphabet" data-alphabet="{{alphabet}}"><span class="label label-default">{{alphabet}}</span></h1>"""
     },
     'data-source': None,
     'set': None,
@@ -276,7 +341,9 @@ bglossary_default_settings = {
     'generate_minified': True,
     'template-variable': False,
     'show-dividers': True,
-    'show-stats': True,
+    'show-stats': False,
+    'show-search': False,
+    'show-lang-selector': False,
     'sort': False,
     'fields': '',
     'site-url': '',
@@ -443,9 +510,6 @@ def generate_listing(settings):
                     )
 
                 if len(t.split(' ')) > 1:
-                    if 'abbreviation' in item:
-                        anchor += '-' + item.get('abbreviation', '').replace(' ', '-').lower()
-
                     intra_links[term.lower()] = anchor
 
                     if 'abbreviation' in item:
@@ -546,6 +610,8 @@ def generate_listing(settings):
                 site_url=settings.get('site-url'),
                 panel_color=settings.get('panel-color'),
                 show_stats=settings.get('show-stats'),
+                show_search=settings.get('show-search'),
+                show_lang_selector=settings.get('show-lang-selector'),
                 latest_update=glossary_registry['modification_date'],
                 term_count=term_count,
                 translation_counts=translation_counts
@@ -595,6 +661,7 @@ def generate_listing_item(glossary_item, settings, main_highlight=False):
     template = Template(settings['item-template'][settings['mode']].strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
     filtered_fields['site_url'] = settings['site-url']
     filtered_fields['item_css'] = item_css
+    filtered_fields['alphabet'] = filtered_fields['term'][0].upper()
 
     html = BeautifulSoup(template.render(**filtered_fields), "html.parser")
     return html.decode()
@@ -639,6 +706,7 @@ def bglossary(content):
 
         for bglossary_div in bglossary_divs:
             # We have div in the page
+
             settings = copy.deepcopy(bglossary_settings)
             settings['data-source'] = get_attribute(bglossary_div.attrs, 'source', bglossary_settings['data-source'])
             settings['set'] = get_attribute(bglossary_div.attrs, 'set', bglossary_settings['set'])
@@ -650,6 +718,8 @@ def bglossary(content):
             settings['fields'] = get_attribute(bglossary_div.attrs, 'fields', bglossary_settings['fields'])
             settings['show-dividers'] = get_attribute(bglossary_div.attrs, 'show-dividers', bglossary_settings['show-dividers']) in ['True', 'true']
             settings['show-stats'] = get_attribute(bglossary_div.attrs, 'show-stats', bglossary_settings['show-stats']) in ['True', 'true']
+            settings['show-search'] = get_attribute(bglossary_div.attrs, 'show-search', bglossary_settings['show-search']) in ['True', 'true']
+            settings['show-lang-selector'] = get_attribute(bglossary_div.attrs, 'show-lang-selector', bglossary_settings['show-lang-selector']) in ['True', 'true']
 
             if isinstance(settings['fields'], str):
                 settings['fields'] = [x.strip() for x in settings['fields'].split(',')]
@@ -674,11 +744,13 @@ def bglossary(content):
 
         if bglossary_settings['minified']:
             html_elements = {
+                'js_include': ['<script type="text/javascript" src="' + bglossary_settings['site-url'] + '/theme/js/bglossary.min.js"></script>'],
                 'css_include': ['<link rel="stylesheet" href="' + bglossary_settings['site-url'] + '/theme/css/bglossary.min.css">']
             }
 
         else:
             html_elements = {
+                'js_include': ['<script type="text/javascript" src="' + bglossary_settings['site-url'] + '/theme/js/bglossary.js"></script>'],
                 'css_include': ['<link rel="stylesheet" href="' + bglossary_settings['site-url'] + '/theme/css/bglossary.css">']
             }
 
@@ -687,6 +759,10 @@ def bglossary(content):
 
         if u'styles' not in content.metadata:
             content.metadata[u'styles'] = []
+
+        for element in html_elements['js_include']:
+            if element not in content.metadata[u'scripts']:
+                content.metadata[u'scripts'].append(element)
 
         for element in html_elements['css_include']:
             if element not in content.metadata[u'styles']:
@@ -771,7 +847,6 @@ def init_default_config(pelican):
 
     bglossary_settings = copy.deepcopy(bglossary_default_settings)
 
-
 def move_resources(gen):
     """
     Move files from css folders to output folder, use minified files.
@@ -781,26 +856,43 @@ def move_resources(gen):
     plugin_paths = gen.settings['PLUGIN_PATHS']
 
     if bglossary_settings['minified']:
+
         if bglossary_settings['generate_minified']:
             minify_css_directory(gen=gen, source='css', target='css.min')
+            minify_js_directory(gen=gen, source='js', target='js.min')
 
         css_target = os.path.join(gen.output_path, 'theme', 'css', 'bglossary.min.css')
 
         if not os.path.exists(os.path.join(gen.output_path, 'theme', 'css')):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'css'))
 
+        js_target = os.path.join(gen.output_path, 'theme', 'js', 'bglossary.min.js')
+
+        if not os.path.exists(os.path.join(gen.output_path, 'theme', 'js')):
+            os.makedirs(os.path.join(gen.output_path, 'theme', 'js'))
+
         for path in plugin_paths:
             css_source = os.path.join(path, 'pelican-bglossary', 'css.min', 'bglossary.min.css')
             if os.path.isfile(css_source):
                 shutil.copyfile(css_source, css_target)
 
-            if os.path.isfile(css_target):
+            js_source = os.path.join(path, 'pelican-bglossary', 'js.min', 'bglossary.min.js')
+
+            if os.path.isfile(js_source):
+                shutil.copyfile(js_source, js_target)
+
+            if os.path.isfile(css_target) and os.path.isfile(js_target):
                 break
+
     else:
         css_target = os.path.join(gen.output_path, 'theme', 'css', 'bglossary.css')
+        js_target = os.path.join(gen.output_path, 'theme', 'js', 'bglossary.js')
 
         if not os.path.exists(os.path.join(gen.output_path, 'theme', 'css')):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'css'))
+
+        if not os.path.exists(os.path.join(gen.output_path, 'theme', 'js')):
+            os.makedirs(os.path.join(gen.output_path, 'theme', 'js'))
 
         for path in plugin_paths:
             css_source = os.path.join(path, 'pelican-bglossary', 'css', 'bglossary.css')
@@ -808,7 +900,12 @@ def move_resources(gen):
             if os.path.isfile(css_source):
                 shutil.copyfile(css_source, css_target)
 
-            if os.path.isfile(css_target):
+            js_source = os.path.join(path, 'pelican-bglossary', 'js', 'bglossary.js')
+
+            if os.path.isfile(js_source):
+                shutil.copyfile(js_source, js_target)
+
+            if os.path.isfile(css_target) and os.path.isfile(js_target):
                 break
 
     img_target_flags = os.path.join(gen.output_path, 'theme', 'images', 'bglossary_flags.png')
@@ -828,7 +925,6 @@ def move_resources(gen):
 
         if os.path.isfile(img_target_flags) and os.path.isfile(img_target_blank):
             break
-
 
 def minify_css_directory(gen, source, target):
     """
@@ -854,6 +950,30 @@ def minify_css_directory(gen, source, target):
                             with open(os.path.join(target_, current_file.replace('.css', '.min.css')), "w") as minified_file:
                                 minified_file.write(rcssmin.cssmin(css_file.read(), keep_bang_comments=True))
 
+def minify_js_directory(gen, source, target):
+    """
+    Move JS resources from source directory to target directory and minify.
+
+    """
+
+    from jsmin import jsmin
+
+    plugin_paths = gen.settings['PLUGIN_PATHS']
+    for path in plugin_paths:
+        source_ = os.path.join(path, 'pelican-bglossary', source)
+        target_ = os.path.join(path, 'pelican-bglossary', target)
+
+        if os.path.isdir(source_):
+            if not os.path.exists(target_):
+                os.makedirs(target_)
+
+            for root, dirs, files in os.walk(source_):
+                for current_file in files:
+                    if current_file.endswith(".js"):
+                        current_file_path = os.path.join(root, current_file)
+                        with open(current_file_path, encoding="utf-8") as js_file:
+                            with open(os.path.join(target_, current_file.replace('.js', '.min.js')), "w", encoding="utf-8") as minified_file:
+                                minified_file.write(jsmin(js_file.read()))
 
 def register():
     """
