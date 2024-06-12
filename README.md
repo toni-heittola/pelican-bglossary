@@ -98,15 +98,16 @@ The parameters can be set in global, and content level. Globally set parameters 
 
 Parameters for the plugin can be set in `pelicanconf.py' with following parameters:
 
-| Parameter                 | Type      | Default       | Description  |
-|---------------------------|-----------|---------------|--------------|
-| BGLOSSARY_SOURCE         | String    |  | YAML-file to contain glossary registry, see example format above. |
-| BGLOSSARY_TEMPLATE       | Dict of Jinja2 templates |  | Two templates can be set for panel and list  |
-| BGLOSSARY_ITEM_TEMPLATE  | Dict of Jinja2 templates |  | Two templates can be set for panel and list  |
-| BGLOSSARY_PANEL_COLOR          | String    | panel-primary |  CSS class used to color the panel template in the default template. Possible values: panel-default, panel-primary, panel-success, panel-info, panel-warning, panel-danger |
-| BGLOSSARY_HEADER               | String    | Content       | Header text  |
-| BGLOSSARY_SORT              | Boolean    | False       | Sorting of the listing based on term  |
-| BGLOSSARY_DEBUG_PROCESSING | Boolean    | False  | Show extra information in when run with `DEBUG=1` |
+| Parameter                 | Type      | Default       | Description                                                                                                                                                               |
+|---------------------------|-----------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| BGLOSSARY_TEMPLATE_MODE   | String    | bs3           | Operation mode selector, possible values 'bs3' for bootstrap3 based themes, bs5 for boostrap5 based themes.                                                               |
+| BGLOSSARY_SOURCE         | String    |  | YAML-file to contain glossary registry, see example format above.                                                                                                         |
+| BGLOSSARY_TEMPLATE       | Dict of Jinja2 templates |  | Two templates can be set for panel and list                                                                                                                               |
+| BGLOSSARY_ITEM_TEMPLATE  | Dict of Jinja2 templates |  | Two templates can be set for panel and list                                                                                                                               |
+| BGLOSSARY_PANEL_COLOR          | String    | panel-primary | CSS class used to color the panel template in the default template. Possible values: panel-default, panel-primary, panel-success, panel-info, panel-warning, panel-danger |
+| BGLOSSARY_HEADER               | String    | Content       | Header text                                                                                                                                                               |
+| BGLOSSARY_SORT              | Boolean    | False       | Sorting of the listing based on term                                                                                                                                      |
+| BGLOSSARY_DEBUG_PROCESSING | Boolean    | False  | Show extra information in when run with `DEBUG=1`                                                                                                                         |
 
 ### Content wise parameters
 

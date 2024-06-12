@@ -23,21 +23,82 @@ logger = logging.getLogger(__name__)
 __version__ = '0.1.0'
 
 bglossary_default_settings = {
+    'template-mode': 'bs3',
     'panel-color': 'panel-default',
     'header': 'Glossary',
     'mode': 'list',
     'template': {
-        'panel': """   
-            <div class="panel {{ panel_color }}">
-                {% if header %}
-                    <div class="panel-heading">
-                    <h3 class="panel-title">{{header}}</h3>
+        'bs3': {
+            'panel': """   
+                <div class="panel {{ panel_color }}">
+                    {% if header %}
+                        <div class="panel-heading">
+                        <h3 class="panel-title">{{header}}</h3>
+                        </div>
+                    {% endif %}
+                    <div class="bglossary-header-container">
+                    <div class="row">            
+                    {% if show_search %}
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" style="height:35px;"><span class="glyphicon glyphicon-search"></span></span>                    
+                            <input type="text" class="form-control" id="bglossary-search" value="" style="height:36px;" placeholder="Search terms...">
+                             <div class="input-group-btn" style="height:35px;">
+                              <button id="bglossary-search-clear" class="btn btn-default" type="button" style="height:36px;">
+                                <i class="glyphicon glyphicon-remove"></i>
+                              </button>
+                            </div>
+                        </div>
                     </div>
-                {% endif %}
+                    {% endif %}
+                    {% if show_lang_selector %}
+                    <div class="col-md-6">
+                        <div class="btn-group pull-right">
+                        {% for key, value in translation_counts.items() -%}
+                            <button type="button" class="btn btn-xs btn-default bglossary-lang-selector" type="button" data-lang="{{key}}">
+                                <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" /> {{key}}
+                            </button>        
+                        {% endfor -%}
+                        </div>
+                    </div>
+                    {% endif %}
+                    </div>
+                    <div class="row">            
+                    {% if show_stats %}
+                    {% if latest_update or term_count or translation_counts %}
+                    <div class="col-md-12">            
+                    <p class="stats" style="padding-top:8px;">
+                        {% if term_count %}
+                        <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
+                        {% endif %}
+                        {% if translation_counts -%}
+                            <small class="text-muted"><strong>Translations</strong> 
+                            {% for key, value in translation_counts.items() -%}
+                            <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" />{{value}} {% endfor -%}
+                            {% if latest_update %}, {% endif %}
+                            </small>
+                        {% endif %}
+                        {% if latest_update %}
+                        <small class="text-muted"><strong>Updated</strong> {{latest_update}}</small>
+                        {% endif %}
+                    </p>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    </div>
+                    </div>                     
+    
+                    <table class="table bglossary-container">
+                    {{list}}
+                    </table>
+                </div>
+            """,
+            'list': """
+                {% if header %}<h1 class="section-heading">{{header}}</h1>{% endif %}
                 <div class="bglossary-header-container">
                 <div class="row">            
                 {% if show_search %}
-                <div class="col-md-6">
+                <div class="col-md-6" style="padding-left:0px;">
                     <div class="input-group">
                         <span class="input-group-addon" style="height:35px;"><span class="glyphicon glyphicon-search"></span></span>                    
                         <input type="text" class="form-control" id="bglossary-search" value="" style="height:36px;" placeholder="Search terms...">
@@ -64,7 +125,7 @@ bglossary_default_settings = {
                 <div class="row">            
                 {% if show_stats %}
                 {% if latest_update or term_count or translation_counts %}
-                <div class="col-md-12">            
+                <div class="col-md-12" style="padding-left:0px;">            
                 <p class="stats" style="padding-top:8px;">
                     {% if term_count %}
                     <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
@@ -84,74 +145,141 @@ bglossary_default_settings = {
                 {% endif %}
                 {% endif %}
                 </div>
-                </div>                     
-                                
-                <table class="table bglossary-container">
-                {{list}}
-                </table>
-            </div>
-        """,
-        'list': """
-            {% if header %}<h1 class="section-heading">{{header}}</h1>{% endif %}
-            <div class="bglossary-header-container">
-            <div class="row">            
-            {% if show_search %}
-            <div class="col-md-6" style="padding-left:0px;">
-                <div class="input-group">
-                    <span class="input-group-addon" style="height:35px;"><span class="glyphicon glyphicon-search"></span></span>                    
-                    <input type="text" class="form-control" id="bglossary-search" value="" style="height:36px;" placeholder="Search terms...">
-                     <div class="input-group-btn" style="height:35px;">
-                      <button id="bglossary-search-clear" class="btn btn-default" type="button" style="height:36px;">
-                        <i class="glyphicon glyphicon-remove"></i>
-                      </button>
+                </div>
+                <div class="list-group bglossary-container"  style="padding-left:1em;">
+                    <div class="row">
+                    {{list}}
                     </div>
                 </div>
-            </div>
-            {% endif %}
-            {% if show_lang_selector %}
-            <div class="col-md-6">
-                <div class="btn-group pull-right">
-                {% for key, value in translation_counts.items() -%}
-                    <button type="button" class="btn btn-xs btn-default bglossary-lang-selector" type="button" data-lang="{{key}}">
-                        <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" /> {{key}}
-                    </button>        
-                {% endfor -%}
+            """
+        },
+        'bs5': {
+            'panel': """   
+                <div class="panel {{ panel_color }}">
+                    {% if header %}
+                        <div class="panel-heading">
+                        <h3 class="panel-title">{{header}}</h3>
+                        </div>
+                    {% endif %}
+                    <div class="bglossary-header-container">
+                    <div class="row">            
+                    {% if show_search %}
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-addon" style="height:35px;"><span class="glyphicon glyphicon-search"></span></span>                    
+                            <input type="text" class="form-control" id="bglossary-search" value="" style="height:36px;" placeholder="Search terms...">
+                             <div class="input-group-btn" style="height:35px;">
+                              <button id="bglossary-search-clear" class="btn btn-default" type="button" style="height:36px;">
+                                <i class="glyphicon glyphicon-remove"></i>
+                              </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if show_lang_selector %}
+                    <div class="col-md-6">
+                        <div class="btn-group pull-right">
+                        {% for key, value in translation_counts.items() -%}
+                            <button type="button" class="btn btn-xs btn-default bglossary-lang-selector" type="button" data-lang="{{key}}">
+                                <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" /> {{key}}
+                            </button>        
+                        {% endfor -%}
+                        </div>
+                    </div>
+                    {% endif %}
+                    </div>
+                    <div class="row">            
+                    {% if show_stats %}
+                    {% if latest_update or term_count or translation_counts %}
+                    <div class="col-md-12">            
+                    <p class="stats" style="padding-top:8px;">
+                        {% if term_count %}
+                        <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
+                        {% endif %}
+                        {% if translation_counts -%}
+                            <small class="text-muted"><strong>Translations</strong> 
+                            {% for key, value in translation_counts.items() -%}
+                            <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" />{{value}} {% endfor -%}
+                            {% if latest_update %}, {% endif %}
+                            </small>
+                        {% endif %}
+                        {% if latest_update %}
+                        <small class="text-muted"><strong>Updated</strong> {{latest_update}}</small>
+                        {% endif %}
+                    </p>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    </div>
+                    </div>                     
+            
+                    <table class="table bglossary-container">
+                    {{list}}
+                    </table>
                 </div>
-            </div>
-            {% endif %}
-            </div>
-            <div class="row">            
-            {% if show_stats %}
-            {% if latest_update or term_count or translation_counts %}
-            <div class="col-md-12" style="padding-left:0px;">            
-            <p class="stats" style="padding-top:8px;">
-                {% if term_count %}
-                <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
+            """,
+            'list': """
+                {% if header %}<h1 class="section-heading">{{header}}</h1>{% endif %}
+                <div class="bglossary-header-container">
+                <div class="row">            
+                {% if show_search %}
+                <div class="col-md-6" style="padding-left:0px;">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>                    
+                        <input type="text" class="form-control" id="bglossary-search" value="" placeholder="Search terms...">                         
+                        <button id="bglossary-search-clear" class="btn btn-outline-secondary btn-default" type="button">
+                            <i class="fa fa-minus-circle"></i>
+                        </button>                        
+                    </div>
+                </div>
                 {% endif %}
-                {% if translation_counts -%}
-                    <small class="text-muted"><strong>Translations</strong> 
+                {% if show_lang_selector %}
+                <div class="col-md-6">
+                    <div class="btn-group pull-right">
                     {% for key, value in translation_counts.items() -%}
-                    <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" />{{value}} {% endfor -%}
-                    {% if latest_update %}, {% endif %}
-                    </small>
-                {% endif %}
-                {% if latest_update %}
-                <small class="text-muted"><strong>Updated</strong> {{latest_update}}</small>
-                {% endif %}
-            </p>
-            </div>
-            {% endif %}
-            {% endif %}
-            </div>
-            </div>
-            <div class="list-group bglossary-container"  style="padding-left:1em;">
-                <div class="row">
-                {{list}}
+                        <button type="button" class="btn btn-xs btn-secondary btn-outline-secondary btn-default bglossary-lang-selector" type="button" data-lang="{{key}}">
+                            <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" /> {{key}}
+                        </button>        
+                    {% endfor -%}
+                    </div>
                 </div>
-            </div>
-        """},
+                {% endif %}
+                </div>
+                <div class="row">            
+                {% if show_stats %}
+                {% if latest_update or term_count or translation_counts %}
+                <div class="col-md-12" style="padding-left:0px;">            
+                <p class="stats" style="padding-top:8px;">
+                    {% if term_count %}
+                    <small class="text-muted"><strong>Terms</strong> {{term_count}}{% if latest_update or translation_counts %}, {% endif %}</small>
+                    {% endif %}
+                    {% if translation_counts -%}
+                        <small class="text-muted"><strong>Translations</strong> 
+                        {% for key, value in translation_counts.items() -%}
+                        <img src="theme/images/bglossary_blank.gif" class="flag flag-{{key}}" />{{value}} {% endfor -%}
+                        {% if latest_update %}, {% endif %}
+                        </small>
+                    {% endif %}
+                    {% if latest_update %}
+                    <small class="text-muted"><strong>Updated</strong> {{latest_update}}</small>
+                    {% endif %}
+                </p>
+                </div>
+                {% endif %}
+                {% endif %}
+                </div>
+                </div>
+                <div class="list-group bglossary-container"  style="padding-left:1em;">
+                    <div class="row">
+                    {{list}}
+                    </div>
+                </div>
+            """
+        }
+    },
     'item-template': {
-        'panel': """
+        'bs3':{
+            'panel': """
             <tr class="bglossary-item" data-term="{{term}}" data-alphabet="{{alphabet}}">
                 <td class="{{item_css}}">
                     <div class="row">
@@ -236,7 +364,7 @@ bglossary_default_settings = {
                 </td>
             </tr>
         """,
-        'list': """
+            'list': """
             <div class="row list-group-item bglossary-item" data-term="{{term}}" data-alphabet="{{alphabet}}">
                 <div class="col-xs-12">
                     <div class="row">
@@ -329,10 +457,199 @@ bglossary_default_settings = {
                     </div>
                 </div>
             </div>
-        """},
+        """
+        },
+        'bs5': {
+            'panel': """
+                <tr class="bglossary-item" data-term="{{term}}" data-alphabet="{{alphabet}}">
+                    <td class="{{item_css}}">
+                        <div class="row">
+                            <div class="col-md-12">
+                            <h2>{{term}}</h2>
+                            {% if wikipedia %}
+                                <a href="{{wikipedia}}" target="_blank" title="Wikipedia"><i class="pull-right fa fa-wikipedia-w fa-border" aria-hidden="true"></i></a>
+                            {% endif %}
+                            {% if wiktionary %}
+                                <a href="{{wiktionary}}" target="_blank" title="Wiktionary"><i class="pull-right fa fa-book fa-border" aria-hidden="true"></i></a>
+                            {% endif %} 
+                            </div>
+                            {% if definition %}
+                            <div class="col-md-12">
+                            <p class="small text-muted">
+                            {{definition}}
+                            </p>
+                            </div>
+                            {% endif %}                        
+                            {% if de or es or fi or fr or pl %}
+                            <div class="col-md-12">
+                            <div class="row">  
+                                {% if de %}
+                                    <div class="col-md-12 de">
+                                    <img src="theme/images/bglossary_blank.gif" class="flag flag-de" alt="German" /> <em>
+                                    {% if de is iterable and de is not string %}
+                                        {{ de|join(', ') }}                                
+                                    {% else %}                                
+                                        {{ de }}
+                                    {% endif %}
+                                    </em>
+                                    </div>      
+                                {% endif %} 
+                                {% if es %}
+                                    <div class="col-md-12 es">
+                                    <img src="theme/images/bglossary_blank.gif" class="flag flag-es" alt="Spain" /> <em>
+                                    {% if es is iterable and es is not string %}
+                                        {{ es|join(', ') }}                                
+                                    {% else %}                                
+                                        {{ es }}
+                                    {% endif %}
+                                    </em>
+                                    </div>      
+                                {% endif %}                                                  
+                                {% if fi %}
+                                    <div class="col-md-12 fi">
+                                    <img src="theme/images/bglossary_blank.gif" class="flag flag-fi" alt="Finland" /> <em>
+                                    {% if fi is iterable and fi is not string %}
+                                        {{ fi|join(', ') }}                                
+                                    {% else %}                                
+                                        {{ fi }}
+                                    {% endif %}
+                                    </em>
+                                    </div>   
+                                {% endif %}
+                                {% if fr %}
+                                    <div class="col-md-12 fr">
+                                    <img src="theme/images/bglossary_blank.gif" class="flag flag-fr" alt="France" /> <em>
+                                    {% if fr is iterable and fr is not string %}
+                                        {{ fr|join(', ') }}                                
+                                    {% else %}                                
+                                        {{ fr }}
+                                    {% endif %}
+                                    </em>
+                                    </div>   
+                                {% endif %}
+                                {% if pl %}
+                                    <div class="col-md-12 pl">
+                                    <img src="theme/images/bglossary_blank.gif" class="flag flag-pl" alt="Poland" /> <em>
+                                    {% if pl is iterable and pl is not string %}
+                                        {{ pl|join(', ') }}                                
+                                    {% else %}                                
+                                        {{ pl }}
+                                    {% endif %}
+                                    </em>
+                                    </div>   
+                                {% endif %}
+                                </div>  
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            """,
+            'list': """
+                <div class="row list-group-item bglossary-item" data-term="{{term}}" data-alphabet="{{alphabet}}">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-10">
+                                <h2 class="list-group-item-heading {{item_css}}">{{term}} {% if abbreviation -%}({{abbreviation}}){% endif %}</h2>
+                            </div>
+                            <div class="col-2 item-icons">
+                                {% if wikipedia %}
+                                    <a href="{{wikipedia}}" target="_blank" title="Wikipedia">
+                                    <i class="fa fa-wikipedia-w fa-border pull-right" aria-hidden="true"></i>
+                                    </a>
+                                {% endif %}
+                                {% if wiktionary %}
+                                    <a href="{{wiktionary}}" target="_blank" title="Wiktionary">
+                                    <i class="fa fa-book fa-border pull-right" aria-hidden="true"></i>
+                                    </a>
+                                {% endif %}                            
+                            </div>
+                        </div>
+                        <div class="row">                                                
+                            <div class="col-12" style="padding-left:3em">
+                                {% if definition %}
+                                <p class="text-muted text-justify">
+                                {{definition}}
+                                </p>
+                                {% endif %}
+                                {% if intra_link %}                            
+                                <p class="text-justify"><strong>See also:</strong> {{ intra_link }}</p>                              
+                                {% endif %}                                                        
+                                {% if de or es or fi or fr or pl %}
+                                    <div class="row">  
+                                    {% if de %}
+                                        <div class="col-12 de">
+                                        <img src="theme/images/bglossary_blank.gif" class="flag flag-de" alt="German" /> <em>
+                                        {% if de is iterable and de is not string %}
+                                            {{ de|join(', ') }}                                
+                                        {% else %}                                
+                                            {{ de }}
+                                        {% endif %}
+                                        </em>
+                                        </div>      
+                                    {% endif %} 
+                                    {% if es %}
+                                        <div class="col-12 es">
+                                        <img src="theme/images/bglossary_blank.gif" class="flag flag-es" alt="Spain" /> <em>
+                                        {% if es is iterable and es is not string %}
+                                            {{ es|join(', ') }}                                
+                                        {% else %}                                
+                                            {{ es }}
+                                        {% endif %}
+                                        </em>
+                                        </div>      
+                                    {% endif %}                                                  
+                                    {% if fi %}
+                                        <div class="col-12 fi">
+                                        <img src="theme/images/bglossary_blank.gif" class="flag flag-fi" alt="Finland" /> <em>
+                                        {% if fi is iterable and fi is not string %}
+                                            {{ fi|join(', ') }}                                
+                                        {% else %}                                
+                                            {{ fi }}
+                                        {% endif %}
+                                        </em>
+                                        </div>   
+                                    {% endif %}
+                                    {% if fr %}
+                                        <div class="col-12 fr">
+                                        <img src="theme/images/bglossary_blank.gif" class="flag flag-fr" alt="France" /> <em>
+                                        {% if fr is iterable and fr is not string %}
+                                            {{ fr|join(', ') }}                                
+                                        {% else %}                                
+                                            {{ fr }}
+                                        {% endif %}
+                                        </em>
+                                        </div>   
+                                    {% endif %}
+                                    {% if pl %}
+                                        <div class="col-12 pl">
+                                        <img src="theme/images/bglossary_blank.gif" class="flag flag-pl" alt="Poland" /> <em>
+                                        {% if pl is iterable and pl is not string %}
+                                            {{ pl|join(', ') }}                                
+                                        {% else %}                                
+                                            {{ pl }}
+                                        {% endif %}
+                                        </em>
+                                        </div>   
+                                    {% endif %}
+                                    </div>  
+                                {% endif %}                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            """
+        }
+    },
     'alphabet-template': {
-        'panel': """<tr class="alphabet" data-alphabet="{{alphabet}}"><td colspan="20"><h1 class="alphabet" data-alphabet="{{alphabet}}"><span class="label label-default">{{alphabet}}</span></h1></td></tr>""",
-        'list': """<h1 class="alphabet" data-alphabet="{{alphabet}}"><span class="label label-default">{{alphabet}}</span></h1>"""
+        'bs3': {
+            'panel': """<tr class="alphabet" data-alphabet="{{alphabet}}"><td colspan="20"><h1 class="alphabet" data-alphabet="{{alphabet}}"><span class="label label-default">{{alphabet}}</span></h1></td></tr>""",
+            'list': """<h1 class="alphabet" data-alphabet="{{alphabet}}"><span class="label label-default">{{alphabet}}</span></h1>"""
+        },
+        'bs5': {
+            'panel': """<tr class="alphabet" data-alphabet="{{alphabet}}"><td colspan="20"><h1 class="alphabet" data-alphabet="{{alphabet}}"><span class="label label-default">{{alphabet}}</span></h1></td></tr>""",
+            'list': """<h1 class="alphabet" data-alphabet="{{alphabet}}"><span class="label label-default">{{alphabet}}</span></h1>"""
+        }
     },
     'data-source': None,
     'set': None,
@@ -563,7 +880,7 @@ def generate_listing(settings):
                     )
 
         html = "\n"
-        alphabet_header_template = Template(settings['alphabet-template'][settings['mode']].strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
+        alphabet_header_template = Template(settings['alphabet-template'][settings['template-mode']][settings['mode']].strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
 
         current_letter = None
         term_count = 0
@@ -601,7 +918,7 @@ def generate_listing(settings):
 
         html += "\n"
 
-        template = Template(settings['template'][settings['mode']].strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
+        template = Template(settings['template'][settings['template-mode']][settings['mode']].strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
 
         return BeautifulSoup(
             template.render(
@@ -658,7 +975,7 @@ def generate_listing_item(glossary_item, settings, main_highlight=False):
         else:
             filtered_fields[field] = None
 
-    template = Template(settings['item-template'][settings['mode']].strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
+    template = Template(settings['item-template'][settings['template-mode']][settings['mode']].strip('\t\r\n').replace('&gt;', '>').replace('&lt;', '<'))
     filtered_fields['site_url'] = settings['site-url']
     filtered_fields['item_css'] = item_css
     filtered_fields['alphabet'] = filtered_fields['term'][0].upper()
@@ -818,6 +1135,9 @@ def init_default_config(pelican):
 
     bglossary_default_settings['site-url'] = pelican.settings['SITEURL']
 
+    if 'BGLOSSARY_TEMPLATE_MODE' in pelican.settings:
+        bglossary_default_settings['template-mode'] = pelican.settings['BGLOSSARY_TEMPLATE_MODE']
+
     if 'BGLOSSARY_SOURCE' in pelican.settings:
         bglossary_default_settings['data-source'] = pelican.settings['BGLOSSARY_SOURCE']
 
@@ -872,7 +1192,7 @@ def move_resources(gen):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'js'))
 
         for path in plugin_paths:
-            css_source = os.path.join(path, 'pelican-bglossary', 'css.min', 'bglossary.min.css')
+            css_source = os.path.join(path, 'pelican-bglossary', 'css.min', 'bglossary_'+bglossary_settings['template-mode']+'.min.css')
             if os.path.isfile(css_source):
                 shutil.copyfile(css_source, css_target)
 
@@ -895,7 +1215,7 @@ def move_resources(gen):
             os.makedirs(os.path.join(gen.output_path, 'theme', 'js'))
 
         for path in plugin_paths:
-            css_source = os.path.join(path, 'pelican-bglossary', 'css', 'bglossary.css')
+            css_source = os.path.join(path, 'pelican-bglossary', 'css', 'bglossary_'+bglossary_settings['template-mode']+'.css')
 
             if os.path.isfile(css_source):
                 shutil.copyfile(css_source, css_target)

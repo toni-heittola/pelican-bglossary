@@ -19,6 +19,13 @@ $(document).ready(function(){
             $(this).addClass('btn-default');
             $('.'+lang).show();
         }
+        if($(this).hasClass('btn-outline-secondary')){
+            $(this).removeClass('btn-outline-secondary');
+            $('.'+lang).hide();
+        }else{
+            $(this).addClass('btn-outline-secondary');
+            $('.'+lang).show();
+        }
     });
 
     $('.btoc-container a, .bglossary-container a').click(function (){
