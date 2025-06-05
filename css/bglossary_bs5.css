@@ -25,6 +25,15 @@
 
 }
 
+.bglossary-item-frame {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+
 /*!
  * Generated with CSS Flag Sprite generator (https://www.flag-sprites.com/)
  */

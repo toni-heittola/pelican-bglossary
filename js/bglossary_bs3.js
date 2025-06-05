@@ -55,7 +55,7 @@ $(document).ready(function(){
             });
 
             $(".bglossary-item[data-alphabet='"+alphabet+"']").each(function(){
-                //console.log($(this).text());
+                //console.log($.trim($(this).text()));
                 if ($(this).text().search(new RegExp(filter, "i")) < 0) {
                     $(this).fadeOut(100);
                 } else {
