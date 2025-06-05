@@ -546,11 +546,12 @@ bglossary_default_settings = {
                 </tr>
             """,
             'list': """
+                <h2 class="list-group-item-heading {{item_css}}">{{term}} {% if abbreviation -%}({{abbreviation}}){% endif %}</h2>
                 <div class="row list-group-item bglossary-item" data-term="{{term}}" data-alphabet="{{alphabet}}">
                     <div class="col-12">
                         <div class="row">
                             <div class="col-10">
-                                <h2 class="list-group-item-heading {{item_css}}">{{term}} {% if abbreviation -%}({{abbreviation}}){% endif %}</h2>
+                                
                             </div>
                             <div class="col-2 item-icons">
                                 {% if wikipedia %}
