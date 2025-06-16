@@ -261,10 +261,10 @@ bglossary_default_settings = {
                         {% if show_search %}
                             <div class="offset-md-8 col-md-4" style="padding-left:0px;">
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="fa fa-search"></i></span>                    
+                                    <span class="input-group-text"><i class="fa fa-solid fa-magnifying-glass fa-search"></i></span>                    
                                     <input type="text" class="form-control" id="bglossary-search" value="" placeholder="Search terms...">                         
                                     <button id="bglossary-search-clear" class="btn btn-outline-secondary btn-default" type="button">
-                                        <i class="fa fa-minus-circle"></i>
+                                        <i class="fa fa-solid fa-circle-minus fa-minus-circle"></i>
                                     </button>                        
                                 </div>
                             </div>
@@ -467,10 +467,10 @@ bglossary_default_settings = {
                             <div class="col-md-12">
                             <h2>{{term}}</h2>
                             {% if wikipedia %}
-                                <a href="{{wikipedia}}" target="_blank" title="Wikipedia"><i class="pull-right fa fa-wikipedia-w fa-border" aria-hidden="true"></i></a>
+                                <a href="{{wikipedia}}" target="_blank" title="Wikipedia" class="link-underline link-underline-opacity-0"><i class="pull-right fa fa-wikipedia-w fa-border" aria-hidden="true"></i></a>
                             {% endif %}
                             {% if wiktionary %}
-                                <a href="{{wiktionary}}" target="_blank" title="Wiktionary"><i class="pull-right fa fa-book fa-border" aria-hidden="true"></i></a>
+                                <a href="{{wiktionary}}" target="_blank" title="Wiktionary" class="link-underline link-underline-opacity-0"><i class="pull-right fa fa-book fa-border" aria-hidden="true"></i></a>
                             {% endif %} 
                             </div>
                             {% if definition %}
@@ -552,13 +552,13 @@ bglossary_default_settings = {
                     </div>
                     <div class="col-2 item-icons">
                         {% if wikipedia %}
-                            <a href="{{wikipedia}}" target="_blank" title="Wikipedia">
-                            <i class="fa fa-wikipedia-w fa-border pull-right" aria-hidden="true"></i>
+                            <a href="{{wikipedia}}" target="_blank" title="Wikipedia" class="link-underline link-underline-opacity-0">
+                            <i class="fa fa-brands fa-wikipedia-w fa-border pull-right" aria-hidden="true"></i>
                             </a>
                         {% endif %}
                         {% if wiktionary %}
-                            <a href="{{wiktionary}}" target="_blank" title="Wiktionary">
-                            <i class="fa fa-book fa-border pull-right" aria-hidden="true"></i>
+                            <a href="{{wiktionary}}" target="_blank" title="Wiktionary" class="link-underline link-underline-opacity-0">
+                            <i class="fa fa-solid fa-book fa-border pull-right" aria-hidden="true"></i>
                             </a>
                         {% endif %}                            
                     </div>                 
